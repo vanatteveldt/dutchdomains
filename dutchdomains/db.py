@@ -3,9 +3,9 @@ import os
 from peewee import SqliteDatabase
 from peewee import Model, CharField, AutoField, ForeignKeyField, FloatField
 
-DB_LOCATION = os.environ.get('DB_LOCATION', ':memory:')
+DB_LOCATION = os.environ.get('DB_LOCATION', 'dutchdomains.db')
 
-if DB_LOCATION != ":memory:" and not os.path.exists(DB_LOCATION):
+if not os.path.exists(DB_LOCATION):
     raise Exception(f"Database file {DB_LOCATION} not found!")
 
 print(f"Using database at {DB_LOCATION}")

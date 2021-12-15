@@ -8,7 +8,6 @@ CATS = {id: label for (id, label) in Category.select(Category.id, Category.label
 
 def get_domains(domains: Iterable[str]) -> Iterable[tuple]:
     for url, logo, cat in Domain.select(Domain.url, Domain.logo, Domain.main_category).where(Domain.url.in_(domains)).tuples():
-        print("!!!!!!", url)
         yield (url, logo, CATS[cat])
 
 
