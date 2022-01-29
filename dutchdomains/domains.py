@@ -1,21 +1,34 @@
 import json
 from typing import Iterable
+import jsonlines
 
-from dutchdomains.db import Domain, Category
-
-CATS = {id: label for (id, label) in Category.select(Category.id, Category.label).tuples()}
-
-
-def get_domains(domains: Iterable[str]) -> Iterable[tuple]:
-    for url, logo, cat in Domain.select(Domain.url, Domain.logo, Domain.main_category).where(Domain.url.in_(domains)).tuples():
-        yield (url, logo, CATS[cat])
+_CATEGORIES = None
 
 
-def get_domains_dict(domains: Iterable[str]) -> dict:
-    return {url: {"logo": logo, "category": cat}
-            for (url, logo, cat) in get_domains(domains)}
+def get_categories():
+    global _CATEGORIES
+    if _CATEGORIES is None:
+        _CATEGORIES = {x['url']: x for x in read_categories()}
+    return _CATEGORIES
+
+
+def read_categories(filename='dutchdomains.jsonl'):
+    with jsonlines.open(filename) as reader:
+        for d in reader:
+            categories = d.pop('categories')
+            d['category'] = max(categories, key=categories.get)
+            yield d
+
+
+def get_domains(domains: Iterable[str]) -> Iterable[dict]:
+    categories = get_categories()
+    for domain in domains:
+        for alias in (domain, domain.replace("www.", ""), f"www.{domain}"):
+            if alias in categories:
+                yield domain, categories[alias]
 
 
 if __name__ == '__main__':
-    result = get_domains_dict(["twitter.com", "www.mediamarkt.nl", "www.ajaxshowtime.com"])
+    result = dict(get_domains(["twitter.com", "mediamarkt.nl", "www.ajaxshowtime.com", "www.twitter.com"]))
+    print(result)
     print(json.dumps(result, indent=2))
