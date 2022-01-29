@@ -1,5 +1,5 @@
 import json
-from typing import Iterable
+from typing import Iterable, Tuple
 import jsonlines
 
 _CATEGORIES = None
@@ -20,7 +20,7 @@ def read_categories(filename='dutchdomains.jsonl'):
             yield d
 
 
-def get_domains(domains: Iterable[str]) -> Iterable[dict]:
+def get_domains(domains: Iterable[str]) -> Iterable[Tuple[str, dict]]:
     categories = get_categories()
     for domain in domains:
         for alias in (domain, domain.replace("www.", ""), f"www.{domain}"):
