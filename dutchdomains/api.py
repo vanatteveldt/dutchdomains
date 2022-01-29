@@ -2,7 +2,7 @@ from hashlib import sha256
 
 from flask import Flask, jsonify, request, abort, Response
 
-from dutchdomains.domains import get_domains, get_domains_dict
+from dutchdomains.domains import get_domains
 
 app = Flask(__name__)
 
@@ -22,7 +22,6 @@ def post_index():
     result = get_domains_dict(urls)
     return jsonify(result)
 
-
 @app.route("/", methods=['GET'])
 def index():
     token = request.args.get('token')
@@ -30,7 +29,7 @@ def index():
     if not (token and urls):
         show_index()
     verify_token(token, urls)
-    result = get_domains_dict(urls)
+    result = dict(get_domains(urls))
     return jsonify(result)
 
 
@@ -45,4 +44,5 @@ def show_index():
     abort(Response("Welcome to the Dutch domain API.\n"
                    'Please either POST with json body: {"token": "..", "urls": ["..", ..]} \n'
                    "or GET with a (repeated) url and token GET argument\n", 400))
+
 
