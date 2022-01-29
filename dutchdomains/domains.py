@@ -16,8 +16,8 @@ def read_categories(filename='dutchdomains.jsonl'):
     with jsonlines.open(filename) as reader:
         for d in reader:
             categories = d.pop('categories')
-            d['category'] = max(categories, key=categories.get)
-            yield d
+            cat = max(categories, key=categories.get)
+            yield dict(url=d['url'], category=cat, icon=d.get('icon-large'))
 
 
 def get_domains(domains: Iterable[str]) -> Iterable[Tuple[str, dict]]:
