@@ -8,6 +8,7 @@ app = Flask(__name__)
 
 KEY = "1234"
 
+
 @app.route("/", methods=['POST'])
 def post_index():
     """
@@ -19,8 +20,9 @@ def post_index():
     if not (token and urls):
         show_index()
     verify_token(token, urls)
-    result = get_domains_dict(urls)
+    result = dict(get_domains(urls))
     return jsonify(result)
+
 
 @app.route("/", methods=['GET'])
 def index():
@@ -44,5 +46,3 @@ def show_index():
     abort(Response("Welcome to the Dutch domain API.\n"
                    'Please either POST with json body: {"token": "..", "urls": ["..", ..]} \n'
                    "or GET with a (repeated) url and token GET argument\n", 400))
-
-
